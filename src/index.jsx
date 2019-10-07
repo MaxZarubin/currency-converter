@@ -1,12 +1,8 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import "./styles/styles";
+import App from './layouts/App';
 
-class HelloWorld extends React.Component {
-    render () {
-        return <span>Hello, Peppa!</span>
-    }
-}
+import './styles/styles';
 
-ReactDOM.render(<HelloWorld />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById('root'));
