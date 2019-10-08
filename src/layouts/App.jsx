@@ -8,7 +8,7 @@ const App = () => {
         return (
             <Jumbotron fluid>
                 <Container>
-                    <h1>Convert Currensy</h1>
+                    <h1>Currency Converter</h1>
                     <Form />
                 </Container>
             </Jumbotron>
