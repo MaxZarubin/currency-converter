@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import Input from './FormInput';
-import Select from './FormSelect';
 import Button from './Button';
 
-import { url, apiKey } from '../../config/config';
+import Select from 'react-select';
 import { Form, Col } from 'react-bootstrap';
+
+import { URL, API_KEY } from '../../config/config';
 
 class FormComponent extends Component {
     state = {
@@ -15,22 +16,22 @@ class FormComponent extends Component {
         firstСurrency: 'ALL',
         secondСurrency: 'ALL',
         calculations: null,
-        answer: ''
+        result: ''
     };
 
     componentDidMount(){
-        const queryString = `${url}currencies?apiKey=${apiKey}`;
+        const queryString = `${URL}currencies?apiKey=${API_KEY}`;
 
         axios.get(queryString).then(response => {
-            const currencieId = [];
+            const currencies = [];
             let res = response.data.results;
 
             for(let key in res){
-                currencieId.push(`${res[key].id}-${res[key].currencyName}`);
+                currencies.push({ value: res[key].id, label: res[key].currencyName});
             }
-
+ 
 			this.setState({
-				currencies: currencieId
+				currencies
 			});
 		});
     }
@@ -43,13 +44,13 @@ class FormComponent extends Component {
             return;
         }
 
-        const queryString = `${url}convert?q=${firstСurrency}_${secondСurrency}&compact=ultra&apiKey=${apiKey}`;
+        const queryString = `${URL}convert?q=${firstСurrency}_${secondСurrency}&compact=ultra&apiKey=${API_KEY}`;
  
         axios.get(queryString).then(response => {
             for(let key in response.data){
                 this.setState({
                     calculations: (response.data[key] * amount).toFixed(3),
-                }, this.handleSetAnswer);
+                }, this.handleSetResult);
             };
 		});       
     }
@@ -60,30 +61,27 @@ class FormComponent extends Component {
         });
     }
 
-    handleChangeSelect = (event) => {
-        const { value, id } = event.target;
-
-        if(id == 1){
-            this.setState({
-				firstСurrency: value.split('-')[0]
-            });
-            return;
-        };
+    handleChangeFirstSelect = (event) => {
         this.setState({
-            secondСurrency: value.split('-')[0]
+			firstСurrency: event.value
         });
     }
 
-    handleSetAnswer = () => {
+    handleChangeSecondSelect = (event) => {
+        this.setState({
+			secondСurrency: event.value
+        });
+    }    
+
+    handleSetResult = () => {
         const { calculations, inputValue, firstСurrency, secondСurrency } = this.state;
         this.setState({
-            answer: `${inputValue} ${firstСurrency} = ${calculations} ${secondСurrency}`
+            result: `${inputValue} ${firstСurrency} = ${calculations} ${secondСurrency}`
         });
     }
 
     render(){
-        const { currencies, answer  } = this.state;
-
+        const { currencies, result } = this.state;
         return (
             <>
                 <Form className="form">
@@ -91,25 +89,23 @@ class FormComponent extends Component {
                         <Col md="2"> 
                             <Input onChangeInput={this.handleChangeInput} />
                         </Col>                                
-                        <Col md="2"> 
+                        <Col md="3"> 
                             <Select 
-                                currencies={currencies} 
-                                id="1" 
-                                onChangeSelect={this.handleChangeSelect} 
+                                options={currencies} 
+                                onChange={this.handleChangeFirstSelect} 
                             />
                         </Col>
-                        <h4>to</h4>                            
-                        <Col md="2"> 
+                        <h5>to</h5>                            
+                        <Col md="3"> 
                             <Select 
-                                currencies={currencies} 
-                                id="2" 
-                                onChangeSelect={this.handleChangeSelect} 
+                                options={currencies} 
+                                onChange={this.handleChangeSecondSelect} 
                             /> 
                         </Col>
                         <Button onCalculate={this.handleCalculate}/>
                     </Form.Row>     
                 </Form>
-                {answer && <h2>{answer}</h2>}
+                {result && <h2>{result}</h2>}
             </>            
         );
     };
