@@ -13,8 +13,8 @@ class FormComponent extends Component {
     state = {
         currencies: [],
         inputValue: 0,
-        firstСurrency: 'ALL',
-        secondСurrency: 'ALL',
+        firstСurrency: 'RUB',
+        secondСurrency: 'USD',
         calculations: null,
         result: ''
     };
@@ -27,7 +27,10 @@ class FormComponent extends Component {
             let res = response.data.results;
 
             for(let key in res){
-                currencies.push({ value: res[key].id, label: res[key].currencyName});
+                currencies.push({ 
+                    value: res[key].id, 
+                    label: `${res[key].id} - ${res[key].currencyName}` 
+                });
             }
  
 			this.setState({
@@ -41,7 +44,8 @@ class FormComponent extends Component {
         const amount = (inputValue && isFinite(inputValue) && inputValue > 0) ? inputValue : null;
 
         if(!amount){
-            return;
+            alert('Enter a positive number');
+            return null;
         }
 
         const queryString = `${URL}convert?q=${firstСurrency}_${secondСurrency}&compact=ultra&apiKey=${API_KEY}`;
@@ -62,6 +66,7 @@ class FormComponent extends Component {
     }
 
     handleChangeFirstSelect = (event) => {
+        console.log(event.value);
         this.setState({
 			firstСurrency: event.value
         });
@@ -91,6 +96,7 @@ class FormComponent extends Component {
                         </Col>                                
                         <Col md="3"> 
                             <Select 
+                                defaultValue={{ label: 'RUB - Russian Ruble', value: 'RUB' }}
                                 options={currencies} 
                                 onChange={this.handleChangeFirstSelect} 
                             />
@@ -98,6 +104,7 @@ class FormComponent extends Component {
                         <h5>to</h5>                            
                         <Col md="3"> 
                             <Select 
+                                defaultValue={{ label: 'USD - United States Dollar', value: 'USD' }}
                                 options={currencies} 
                                 onChange={this.handleChangeSecondSelect} 
                             /> 
